@@ -1,0 +1,44 @@
+{
+  "name": "karellens/reactive-admin",
+  "description": "Fast and easy customizable admin interface for Laravel 5",
+  "type": "library",
+  "keywords": ["administrator", "admin", "database", "laravel", "cms"],
+  "homepage": "https://github.com/karellens/reactive-admin",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Denis Bozhenkov",
+      "email": "mastermind@karellens.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/karellens/reactive-admin/issues"
+  },
+  "require": {
+    "php": ">=7.0.0",
+    "laravel/framework": "~5.5",
+    "intervention/image": "~2.3",
+    "zizaco/entrust": "5.2.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~6.0",
+    "laravel/laravel": "~5.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Karellens\\ReactiveAdmin\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Karellens\\ReactiveAdmin\\ReactiveAdminServiceProvider"
+      ],
+      "aliases": {
+        "ReactiveAdmin": "Karellens\\ReactiveAdmin\\Facades\\ReactiveAdmin"
+      }
+
+    }
+  },
+  "minimum-stability": "dev"
+}

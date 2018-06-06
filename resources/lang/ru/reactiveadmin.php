@@ -1,7 +1,36 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: karellen
- * Date: 4/15/18
- * Time: 10:20 AM
- */
+
+return [
+
+    'index' => [
+        'edit'      => 'Редактировать',
+        'trash'     => 'В корзину',
+        'restore'   => 'Восстановить',
+        'delete'    => 'Удалить',
+    ],
+
+    'create'    => [
+        'title'     => 'Создать',
+        'cancel'    => 'Отмена',
+    ],
+    'show'      => [
+
+    ],
+    'edit'      => [
+        'title'     => 'Редактировать',
+        'save'      => 'Соханить',
+        'cancel'    => 'Отмена',
+    ],
+
+    'notifications' => [
+        'updated'   => ':object :title обновлен!',
+        'deleted'   => ':object :title удален!',
+        'trashed'   => ':object :title перемещен в корзину!',
+        'restored'  => ':object :title восстановлен!',
+    ],
+
+    'exit'      => 'Выход',
+    'close'     => 'Закрыть',
+    'new'       => 'Создать',
+    'dashboard' => 'Панель',
+];

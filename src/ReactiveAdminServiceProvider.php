@@ -14,13 +14,14 @@ class ReactiveAdminServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'reactive-admin');
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'reactive-admin');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'reactiveadmin');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'reactiveadmin');
 
-        $this->publishes([__DIR__.'/../config/reactiveadmin.php' => config_path('reactiveadmin.php')], 'reactive-admin-config');
-        $this->publishes([__DIR__.'/../resources/assets' => public_path('vendor/reactive-admin')], 'reactive-admin-assets');
+        $this->publishes([__DIR__.'/../config/reactiveadmin.php' => config_path('reactiveadmin.php')], 'config');
+        $this->publishes([__DIR__.'/../resources/views' => resource_path('views/vendor/reactiveadmin')], 'views');
+        $this->publishes([__DIR__.'/../resources/assets' => public_path('vendor/reactiveadmin')], 'public');
 
-        $this->loadRoutesFrom('routes.php');
+        $this->loadRoutesFrom(__DIR__.'/routes.php');
 
     }
 
@@ -31,6 +32,8 @@ class ReactiveAdminServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+//        $this->mergeConfigFrom(
+//            __DIR__.'/../config/reactiveadmin.php', 'reactiveadmin'
+//        );
     }
 }

@@ -18,7 +18,7 @@
     "php": ">=7.0.0",
     "laravel/framework": "~5.5",
     "intervention/image": "~2.3",
-    "zizaco/entrust": "5.2.*"
+    "lavary/laravel-menu": "^1.7",
   },
   "require-dev": {
     "phpunit/phpunit": "~6.0",

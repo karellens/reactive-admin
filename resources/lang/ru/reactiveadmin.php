@@ -29,6 +29,7 @@ return [
         'restored'  => ':object :title восстановлен!',
     ],
 
+    'signout'   => 'Выйти',
     'exit'      => 'Выход',
     'close'     => 'Закрыть',
     'new'       => 'Создать',

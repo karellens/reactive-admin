@@ -18,6 +18,7 @@
     <!-- Custom styles for this template -->
     <link href="{!! asset('vendor/reactiveadmin/css/dashboard.css')  !!} " rel="stylesheet">
     <link rel="stylesheet" href="{!! asset('vendor/reactiveadmin/css/fontawesome-all.min.css') !!}">
+    @stack('styles')
 </head>
 
 <body>
@@ -57,6 +58,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 <!-- Scripts -->
 <script src="{{ asset('vendor/reactiveadmin/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('vendor/reactiveadmin/js/reactiveadmin.js') }}"></script>
 
 @stack('scripts')
 </body>

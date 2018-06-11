@@ -44,7 +44,7 @@
                                 @if(isset($attrs['wrapper']))
                                     <td>{!! $attrs['wrapper']($one->$field) !!}</td>
                                 @else
-                                    <td>{!! $one->$field !!}</td>
+                                    <td>{!! str_limit($one->$field, 80); !!}</td>
                                 @endif
                             @endif
                         @endforeach
@@ -66,7 +66,7 @@
             </table>
         </div>
 
-        {{ method_exists($rows, 'links') ? $rows->links() : '' }}
+        {{ method_exists($rows, 'links') ? $rows->links('reactiveadmin::partials.pagination') : '' }}
 
             <div id="confirmDelete" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmLabel" aria-hidden="true">
                 <div class="modal-dialog modal-sm">

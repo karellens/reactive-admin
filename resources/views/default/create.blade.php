@@ -1,45 +1,27 @@
-@extends('reactiveadmin.root')
+@extends('reactiveadmin::root')
 
 {{-- Content --}}
 @section('content')
-
-    @if(isset($sidebar))
-    <div class="col-sm-3 col-md-2 sidebar">
-        <ul class="nav nav-sidebar">
-            @if(isset($categories))
-            @foreach($categories as $one)
-            <li{{ Request::url() == 'admin/'.$one->alias ? ' class="active"' : '' }}>
-                <a href="{{ URL::to('admin/category/'.$one->alias) }}">{{{ $one->title }}}</a>
-                @if(!empty($one->children))
-                    <ul>
-                    @foreach($one->children as $two)
-                        <li{{ Request::url() == 'admin/'.$one->alias ? ' class="active"' : '' }}>
-                            <a href="{{ URL::to('admin/category/'.$two->alias) }}">{{{ $two->title }}}</a>
-                        </li>
-                    @endforeach
-                    </ul>
-                @endif
-                </li>
-            @endforeach
-            @endif
-        </ul>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>{!! trans('reactiveadmin::reactiveadmin.create.title') !!} {!! trans_choice($config['title'], 1) !!} @if(isset($config['description']))<small>{!! $config['description'] !!}</small>@endif</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{!! url(config('reactiveadmin.uri').'/'.$alias.'/create') !!}" class="btn btn-success" data-toggle="modalCreate">
+                <span class="fa fa-plus-circle"></span> {!! trans('reactiveadmin::reactiveadmin.new') !!}
+            </a>
+        </div>
     </div>
-    @endif
 
-    <div class="@if(isset($sidebar)) col-sm-offset-3 col-md-offset-2 @endif col-md-10 col-sm-9 main">
-        @include('reactiveadmin.partials.notifications')
-        <h1 class="page-header">{!! trans('reactiveadmin.create.title') !!} {!! trans_choice($config['title'], 1) !!}</h1>
+    @include('reactiveadmin::partials.notifications')
 
-        <!-- Tab panes -->
-        <form action="{!! url(config('reactiveadmin.uri').'/'.$alias) !!}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
-            {!! csrf_field() !!}
-            @include('reactiveadmin.partials.create_ajax')
+    <!-- Form panes -->
+    <form action="{!! url(config('reactiveadmin.uri').'/'.$alias) !!}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+        {!! csrf_field() !!}
+        @include('reactiveadmin::partials.create_ajax')
 
-            <div class="form-group">
-                <div class="col-sm-12">
-                    <button type="submit" class="btn btn-lg btn-primary pull-right">{!! trans('reactiveadmin.create.title') !!}</button>
-                </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-lg btn-primary float-right">{!! trans('reactiveadmin::reactiveadmin.create.title') !!}</button>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 @stop

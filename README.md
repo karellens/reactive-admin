@@ -59,3 +59,82 @@ Be sure to also add the middleware to the `app\Http\Kernel.php`
         return $next($request);
     }
 ```
+
+
+Example of RAAConfig array:
+
+```php
+<?php
+
+/**
+ * Page model config
+ */
+
+return [
+    'model' => App\Page::with('blocks'),
+    'class_name' => 'App\Page',
+
+    'title' => 'Страницы',
+
+    /**
+     * The display columns
+     */
+    'fields' => [
+        'id'		=> [
+            'title'		=> '#',
+        ],
+        'title' => [
+            'title' => 'Навание',
+        ],
+        'blocks' => [
+            'title'     => 'Блоки',
+            'wrapper'   => function ($value) {
+                return $value->map(function($v){ return '<a href="/admin/blocks/'.$v->id.'/edit">'.$v->title.'</a>'; })->implode(', ');
+            }
+        ],
+        'alias' => [
+            'title' => 'Алиас',
+        ],
+        'keywords' => [
+            'title' => 'Meta keywords',
+        ],
+        'description' => [
+            'title' => 'Meta description',
+        ],
+    ],
+
+    /**
+     * The filter set
+     */
+    'filters' => [
+        'id',
+    ],
+
+    /**
+     * The editable fields
+     */
+    'edit_fields' => [
+        'title' => [
+            'title' => 'Название',
+            'type' => 'string',
+        ],
+        'alias' => [
+            'title' => 'Алиас',
+            'type' => 'string',
+        ],
+        'content' => [
+            'title' => 'Текст',
+            'type' => 'wysiwyg',
+        ],
+        'keywords' => [
+            'title' => 'Meta keywords',
+            'type' => 'string',
+        ],
+        'description' => [
+            'title' => 'Meta description',
+            'type' => 'text',
+        ],
+    ],
+
+];
+```

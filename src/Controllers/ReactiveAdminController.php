@@ -69,20 +69,27 @@ class ReactiveAdminController extends Controller
         return $this->config['edit_fields'][$field_name]['type'];
     }
 
-    protected function storePublicFile(UploadedFile $uploadedFile, $folderName)
+    protected function storePublicFile(UploadedFile $uploadedFile, $dimensions = [[200, 200]])
     {
-        $original_path = public_path('upload/original/'.$folderName);
-        $uploadedFile->move($original_path, $uploadedFile->getClientOriginalName());
+        @mkdir($original_dir, 0755, true);
+        $name = md5($uploadedFile->getClientOriginalName() . time()).'.'.pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_EXTENSION);;
 
-        $img = Image::make($original_path.'/'.$uploadedFile->getClientOriginalName());
-        $img->fit(200, 200, function ($constraint) {
-            $constraint->upsize();
-        });
+        $original_dir = public_path('storage/original');
+        $uploadedFile->move($original_dir, $name);
 
-        @mkdir(public_path('upload/thumbnail/'.$folderName), 0755, true);
-        $img->save(public_path('upload/thumbnail/'.$folderName.'/'.$uploadedFile->getClientOriginalName()));
+        foreach ($dimensions as $fragment) {
+            $thumbnail_dir = public_path('storage/'.implode('x', $fragment));
+            @mkdir($thumbnail_dir, 0755, true);
 
-        return 'thumbnail/'.$folderName.'/'.$uploadedFile->getClientOriginalName();
+            $img = Image::make($original_dir.'/'.$name);
+            $img->fit($fragment[0], $fragment[1], function ($constraint) {
+                $constraint->upsize();
+            });
+
+            $img->save($thumbnail_dir.'/'.$name);
+        }
+
+        return $name;
     }
 
     protected function applyFilter(&$model)
@@ -223,7 +230,8 @@ class ReactiveAdminController extends Controller
         {
             if(is_a($v, 'Illuminate\Http\UploadedFile'))
             {
-                $own_fields[$k] = $this->storePublicFile($v, str_plural($k));
+                $sizes = $this->config['edit_fields'][$k]['sizes'];
+                $own_fields[$k] = $this->storePublicFile($v, $sizes);
             }
             elseif (!is_array($v))
             {

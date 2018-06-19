@@ -15,6 +15,8 @@
 
 
     @if(isset($rows) && count($rows))
+        {{ method_exists($rows, 'links') ? $rows->links('reactiveadmin::partials.pagination') : '' }}
+
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
@@ -24,7 +26,7 @@
                         <?php $dir = isset($orderBy[$field]) && $orderBy[$field]=='desc' ? 'asc' : 'desc' ?>
                         <th>{!! isset($attrs['title']) ? $attrs['title'] : $field !!} <a
                                     href="{!! request()->url() !!}?{!! http_build_query(array_merge(["orderBy[$field]"=>$dir], request()->except('orderBy'))) !!}"
-                                    class="glyphicon @if($dir=='asc') glyphicon-chevron-up @else glyphicon-chevron-down @endif @if(isset($orderBy[$field])) active @endif"
+                                    class="fa @if($dir=='asc') fa-chevron-up @else fa-chevron-down @endif @if(isset($orderBy[$field])) active @endif"
                             ></a></th>
                     @endforeach
                     <th></th>
@@ -68,78 +70,78 @@
 
         {{ method_exists($rows, 'links') ? $rows->links('reactiveadmin::partials.pagination') : '' }}
 
-            <div id="confirmDelete" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmLabel" aria-hidden="true">
-                <div class="modal-dialog modal-sm">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                            <h4 class="modal-title" id="confirmLabel">Уверены?</h4>
+        <div id="confirmDelete" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="confirmLabel">Уверены?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-1 col-sm-2 text-center"><span class="glyphicon glyphicon-question-sign" style="font-size: 24px;"></span></div>
+                            <div class="col-xs-11 col-sm-10"><p>Вы действительно хотите удалить запись?</p></div>
                         </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-xs-1 col-sm-2 text-center"><span class="glyphicon glyphicon-question-sign" style="font-size: 24px;"></span></div>
-                                <div class="col-xs-11 col-sm-10"><p>Вы действительно хотите удалить запись?</p></div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <form action="" method="post">
-                                {!! csrf_field() !!}
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="button" class="btn btn-default" tabindex="0" data-dismiss="modal">Отмена</button>
-                                <button type="submit" class="btn btn-danger" tabindex="1">Удалить</button>
-                            </form>
-                        </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div>
-
-
-            <!--  Modal edit -->
-            <div id="modalEdit" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
+                    </div>
+                    <div class="modal-footer">
                         <form action="" method="post">
                             {!! csrf_field() !!}
-                            <input type="hidden" name="_method" value="PUT" class="form-horizontal" role="form" enctype="multipart/form-data">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{!! trans('reactiveadmin.close') !!}</span></button>
-                                <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.edit.title') !!} <q>{!! trans_choice($config['title'], 1) !!}</q></h3>
-                            </div>
-                            <div class="modal-body">
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">{!! trans('reactiveadmin.edit.cancel') !!}</button>
-                                <button type="submit" class="btn btn-lg btn-primary">{!! trans('reactiveadmin.edit.save') !!}</button>
-                            </div>
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="button" class="btn btn-default" tabindex="0" data-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-danger" tabindex="1">Удалить</button>
                         </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+
+
+        <!--  Modal edit -->
+        <div id="modalEdit" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form action="" method="post">
+                        {!! csrf_field() !!}
+                        <input type="hidden" name="_method" value="PUT" class="form-horizontal" role="form" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{!! trans('reactiveadmin.close') !!}</span></button>
+                            <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.edit.title') !!} <q>{!! trans_choice($config['title'], 1) !!}</q></h3>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                        <div class="modal-body">
 
-            <!--  Modal create -->
-            <div id="modalCreate" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
-                            {!! csrf_token() !!}
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{!! trans('reactiveadmin.close') !!}</span></button>
-                                <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.create.title') !!} <q>{!! trans_choice($config['title'], 1) !!}</q></h3>
-                            </div>
-                            <div class="modal-body">
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">{!! trans('reactiveadmin.create.cancel') !!}</button>
-                                <button type="submit" class="btn btn-lg btn-primary">{!! trans('reactiveadmin.create.title') !!}</button>
-                            </div>
-                        </form>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">{!! trans('reactiveadmin.edit.cancel') !!}</button>
+                            <button type="submit" class="btn btn-lg btn-primary">{!! trans('reactiveadmin.edit.save') !!}</button>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
-          @endif
+        <!--  Modal create -->
+        <div id="modalCreate" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+                        {!! csrf_token() !!}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{!! trans('reactiveadmin.close') !!}</span></button>
+                            <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.create.title') !!} <q>{!! trans_choice($config['title'], 1) !!}</q></h3>
+                        </div>
+                        <div class="modal-body">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">{!! trans('reactiveadmin.create.cancel') !!}</button>
+                            <button type="submit" class="btn btn-lg btn-primary">{!! trans('reactiveadmin.create.title') !!}</button>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    @endif
 @stop

@@ -8,18 +8,26 @@
     <link href="{{ asset('vendor/reactiveadmin/summernote/summernote-bs4.css') }}" rel="stylesheet">
 @endpush
 @push('scripts')
-    <script src="{{ asset('vendor/reactiveadmin/summernote/summernote-bs4.min.js') }}"></script>
+    <script src="{{ asset('vendor/reactiveadmin/summernote/summernote-bs4.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('.summernote').summernote({
-                height: 200
+                height: 300,
+                toolbar: [
+                    ['edit',['undo','redo']],
+                    ['headline', ['style']],
+                    ['style', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+                    ['fontface', ['fontname']],
+                    ['textsize', ['fontsize']],
+                    ['fontclr', ['color']],
+                    ['alignment', ['ul', 'ol', 'paragraph', 'lineheight']],
+                    ['height', ['height']],
+                    ['table', ['table']],
+                    ['insert', ['link','picture','video','hr']],
+                    ['view', ['fullscreen', 'codeview']],
+                    ['help', ['help']]
+                ]
             });
-
-            $('textarea[name="{{ $name }}"]').parents('form').submit(function (e) {
-                $('.summernote').each( function() {
-                    $(this).val($(this).code());
-                });
-            })
         });
     </script>
 @endpush

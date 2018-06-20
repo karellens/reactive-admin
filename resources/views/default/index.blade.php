@@ -13,7 +13,6 @@
 
     @include('reactiveadmin::partials.notifications')
 
-
     @if(isset($rows) && count($rows))
         {{ method_exists($rows, 'links') ? $rows->links('reactiveadmin::partials.pagination') : '' }}
 
@@ -24,10 +23,10 @@
                     <?php $orderBy = request()->input('orderBy', []) ?>
                     @foreach($config['fields'] as $field => $attrs)
                         <?php $dir = isset($orderBy[$field]) && $orderBy[$field]=='desc' ? 'asc' : 'desc' ?>
-                        <th>{!! isset($attrs['title']) ? $attrs['title'] : $field !!} <a
+                        <th>{!! isset($attrs['title']) ? $attrs['title'] : $field !!} @if(isset($attrs['order']) && $attrs['order'])<a
                                     href="{!! request()->url() !!}?{!! http_build_query(array_merge(["orderBy[$field]"=>$dir], request()->except('orderBy'))) !!}"
-                                    class="fa @if($dir=='asc') fa-chevron-up @else fa-chevron-down @endif @if(isset($orderBy[$field])) active @endif"
-                            ></a></th>
+                                    class="fa @if($dir=='asc') fa-chevron-up @else fa-chevron-down @endif @if(isset($orderBy[$field])) text-danger @endif"
+                            ></a>@endif</th>
                     @endforeach
                     <th></th>
                 </tr>

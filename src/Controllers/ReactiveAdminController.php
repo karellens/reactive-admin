@@ -71,10 +71,11 @@ class ReactiveAdminController extends Controller
 
     protected function storePublicFile(UploadedFile $uploadedFile, $dimensions = [[200, 200]])
     {
-        @mkdir($original_dir, 0755, true);
-        $name = md5($uploadedFile->getClientOriginalName() . time()).'.'.pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_EXTENSION);;
-
         $original_dir = public_path('storage/original');
+        @mkdir($original_dir, 0755, true);
+
+        $name = md5($uploadedFile->getClientOriginalName() . time()).'.'.pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_EXTENSION);
+
         $uploadedFile->move($original_dir, $name);
 
         foreach ($dimensions as $fragment) {
@@ -159,7 +160,12 @@ class ReactiveAdminController extends Controller
         // filter only direct fields
         foreach ($input as $k => $v)
         {
-            if (!is_array($v))
+            if(is_a($v, 'Illuminate\Http\UploadedFile'))
+            {
+                $sizes = $this->config['edit_fields'][$k]['sizes'];
+                $own_fields[$k] = $this->storePublicFile($v, $sizes);
+            }
+            elseif (!is_array($v))
             {
                 $own_fields[$k] = $v;
             }

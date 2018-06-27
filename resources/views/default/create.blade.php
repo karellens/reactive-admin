@@ -15,7 +15,7 @@
 
     <!-- Form panes -->
     <form action="{!! url(config('reactiveadmin.uri').'/'.$alias) !!}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
-        {!! csrf_field() !!}
+        @csrf
         @include('reactiveadmin::partials.create_ajax')
 
         <div class="form-group">

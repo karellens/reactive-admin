@@ -15,10 +15,6 @@ Route::group([
 //        return back();
 //    });
 
-    Route::post('/{alias}/upload',          'ReactiveAdminController@upload');
-    Route::put('/{alias}/{id?}/upload',     'ReactiveAdminController@upload');
-    Route::delete('/upload',                'ReactiveAdminController@upload');
-
     Route::get('/{alias?}',                 'ReactiveAdminController@index');   //  model ? model : dashboard
     Route::get('/{alias}/create',           'ReactiveAdminController@create');
     Route::get('/{alias}/{id}',             'ReactiveAdminController@show');
@@ -30,4 +26,8 @@ Route::group([
     Route::post('/{alias}',                 'ReactiveAdminController@store');
     Route::put('/{alias}/{id}',             'ReactiveAdminController@update');
     Route::delete('/{alias}/{id}/destroy',  'ReactiveAdminController@destroy');
+
+//    Route::post('/upload',                  'ReactiveAdminController@upload');
+//    Route::put('/{alias}/{id?}/upload',     'ReactiveAdminController@upload');
+//    Route::delete('/upload',                'ReactiveAdminController@upload');
 });

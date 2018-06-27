@@ -43,7 +43,7 @@
                                 @endif
                             @else
                                 @if(isset($attrs['wrapper']))
-                                    <td>{!! $attrs['wrapper']($one->$field) !!}</td>
+                                    <td>{!! $attrs['wrapper']($one->$field, $one) !!}</td>
                                 @else
                                     <td>{!! str_limit($one->$field, 80); !!}</td>
                                 @endif

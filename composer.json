@@ -25,6 +25,9 @@
     "laravel/laravel": "~5.5"
   },
   "autoload": {
+    "files": [
+      "src/helpers.php"
+    ],
     "psr-4": {
       "Karellens\\ReactiveAdmin\\": "src/"
     }

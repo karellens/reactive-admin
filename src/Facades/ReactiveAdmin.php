@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Karellens\ReactiveAdmin\Facades;
@@ -14,6 +13,6 @@ class ReactiveAdmin extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'reactiveadmin';
+        return 'Karellens\ReactiveAdmin\Repositories\ReactiveAdmin';
     }
 }

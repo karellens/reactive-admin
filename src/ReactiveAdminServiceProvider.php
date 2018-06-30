@@ -32,6 +32,9 @@ class ReactiveAdminServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('Karellens\ReactiveAdmin\Repositories\ReactiveAdmin', function ($app) {
+            return new \Karellens\ReactiveAdmin\Repositories\ReactiveAdmin;
+        });
 //        $this->mergeConfigFrom(
 //            __DIR__.'/../config/reactiveadmin.php', 'reactiveadmin'
 //        );

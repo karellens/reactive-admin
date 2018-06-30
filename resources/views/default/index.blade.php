@@ -3,9 +3,9 @@
 {{-- Content --}}
 @section('content')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1>{!! trans_choice($config['title'], 2) !!} @if(isset($config['description']))<small>{!! $config['description'] !!}</small>@endif</h1>
+        <h1>{!! trans_choice($resource->getTitle(), 2) !!} {!! str_wrap($resource->getDescription(), ['<small>', '</small>']) !!}</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{!! url(config('reactiveadmin.uri').'/'.$alias.'/create') !!}" class="btn btn-success" data-toggle="modalCreate">
+            <a href="{!! $resource->getCreateLink() !!}" class="btn btn-success" data-toggle="modalCreate">
                 <span class="fa fa-plus-circle"></span> {!! trans('reactiveadmin::reactiveadmin.new') !!}
             </a>
         </div>
@@ -21,12 +21,12 @@
                 <thead>
                 <tr>
                     <?php $orderBy = request()->input('orderBy', []) ?>
-                    @foreach($config['fields'] as $field => $attrs)
-                        <?php $dir = isset($orderBy[$field]) && $orderBy[$field]=='desc' ? 'asc' : 'desc' ?>
-                        <th>{!! isset($attrs['title']) ? $attrs['title'] : $field !!} @if(isset($attrs['order']) && $attrs['order'])<a
-                                    href="{!! request()->url() !!}?{!! http_build_query(array_merge(["orderBy[$field]"=>$dir], request()->except('orderBy'))) !!}"
-                                    class="fa @if($dir=='asc') fa-chevron-up @else fa-chevron-down @endif @if(isset($orderBy[$field])) text-danger @endif"
-                            ></a>@endif</th>
+                    @foreach($resource->getColumnTitles() as $title)
+                        <th>{!! $title !!}</th>
+                        {{--<th>{!! isset($attrs['title']) ? $attrs['title'] : $field !!} @if(isset($attrs['order']) && $attrs['order'])<a--}}
+                                    {{--href="{!! request()->url() !!}?{!! http_build_query(array_merge(["orderBy[$field]"=>$dir], request()->except('orderBy'))) !!}"--}}
+                                    {{--class="fa @if($dir=='asc') fa-chevron-up @else fa-chevron-down @endif @if(isset($orderBy[$field])) text-danger @endif"--}}
+                            {{--></a>@endif</th>--}}
                     @endforeach
                     <th></th>
                 </tr>

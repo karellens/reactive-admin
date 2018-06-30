@@ -7,19 +7,16 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Route;
 use Intervention\Image\Facades\Image;
+use Karellens\ReactiveAdmin\Facades\ReactiveAdmin;
 
 class ReactiveAdminController extends Controller
 {
-
-    protected $model;
-    protected $class_name;
-    protected $alias;
+    protected $resource;
+    protected $key;
     protected $resourceId;
     protected $orderBy;
     protected $perPage;
-    protected $filterParams;
-    protected $config;
-    protected $views;
+    protected $filterBy;
 
 
     /**
@@ -30,39 +27,32 @@ class ReactiveAdminController extends Controller
     public function __construct(Route $route)
     {
         // get alias & id
-        $this->alias = $route->parameter('alias');
+        $this->key = $route->parameter('alias');
         $this->resourceId = $route->parameter('id');
-
-        if($this->alias && !in_array($this->alias, ['upload', 'files']))
-        {
-            $this->config = $this->getModelConfig($this->alias);
-            $this->model = $this->config['model'];
-            $this->class_name = $this->config['class_name'];
-        }
 
         $this->orderBy = (array)request()->input('orderBy');
         $this->perPage = (int)request()->input('perPage', 20);
 
 
-        $this->filterParams = (array)array_filter(
-            request()->except(['orderBy', 'perPage', 'page']),
-            function($val) {
-                if(is_array($val) && isset($val['starts']) && isset($val['ends']))
-                {
-                    return (bool)$val['starts'] && (bool)$val['ends'];
-                }
-                else
-                {
-                    return (bool)$val;
-                }
-            }
-        );
+//        $this->filterBy = (array)array_filter(
+//            request()->except(['orderBy', 'perPage', 'page']),
+//            function($val) {
+//                if(is_array($val) && isset($val['starts']) && isset($val['ends']))
+//                {
+//                    return (bool)$val['starts'] && (bool)$val['ends'];
+//                }
+//                else
+//                {
+//                    return (bool)$val;
+//                }
+//            }
+//        );
 
         // define views
-        $this->views['create']  = view()->exists('reactiveadmin::'.$this->alias.'.create') ? 'reactiveadmin::'.$this->alias.'.create' : 'reactiveadmin::default.create';
-        $this->views['edit']    = view()->exists('reactiveadmin::'.$this->alias.'.edit') ? 'reactiveadmin::'.$this->alias.'.edit' : 'reactiveadmin::default.edit';
-        $this->views['index']   = view()->exists('reactiveadmin::'.$this->alias.'.index') ? 'reactiveadmin::'.$this->alias.'.index' : 'reactiveadmin::default.index';
-        $this->views['show']    = view()->exists('reactiveadmin::'.$this->alias.'.show') ? 'reactiveadmin::'.$this->alias.'.show' : 'reactiveadmin::default.show';
+        $this->views['create']  = view()->exists('reactiveadmin::'.$this->key.'.create') ? 'reactiveadmin::'.$this->key.'.create' : 'reactiveadmin::default.create';
+        $this->views['edit']    = view()->exists('reactiveadmin::'.$this->key.'.edit') ? 'reactiveadmin::'.$this->key.'.edit' : 'reactiveadmin::default.edit';
+        $this->views['index']   = view()->exists('reactiveadmin::'.$this->key.'.index') ? 'reactiveadmin::'.$this->key.'.index' : 'reactiveadmin::default.index';
+        $this->views['show']    = view()->exists('reactiveadmin::'.$this->key.'.show') ? 'reactiveadmin::'.$this->key.'.show' : 'reactiveadmin::default.show';
     }
 
     protected function getFieldType($field_name)
@@ -142,19 +132,20 @@ class ReactiveAdminController extends Controller
 
     public function index()
     {
-        if(!$this->model)   // show start page
+        $resource = ReactiveAdmin::getResource($this->key);
+        if(!$resource)   // show start page
         {
             return view('reactiveadmin::dashboard');
         }
         else
         {
             // apply filter
-            $model = $this->applyFilter($this->model);
+//            $model = $this->applyFilter($this->model);
 
             return view($this->views['index'])
-                ->with('rows', $model->paginate($this->perPage))
-                ->with('config', $this->config)
-                ->with('alias', $this->alias);
+                ->with('rows', $resource->getQuery()->paginate($this->perPage))
+                ->with('resource', $resource)
+                ->with('key', $this->key);
         }
     }
 
@@ -162,7 +153,7 @@ class ReactiveAdminController extends Controller
     {
         return view($this->views['create'])
             ->with('config', $this->config)
-            ->with('alias', $this->alias);
+            ->with('alias', $this->key);
     }
 
     public function store()
@@ -238,7 +229,7 @@ class ReactiveAdminController extends Controller
         }
 
         // redirect back
-        return redirect()->to(config('reactiveadmin.uri').'/'.$this->alias);
+        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
     }
 
     public function show()
@@ -248,7 +239,7 @@ class ReactiveAdminController extends Controller
         return view($this->views['show'])
             ->with('row', $instance)
             ->with('config', $this->config)
-            ->with('alias', $this->alias);
+            ->with('alias', $this->key);
     }
 
     public function edit()
@@ -257,7 +248,7 @@ class ReactiveAdminController extends Controller
         return view($this->views['edit'])
             ->with('row', $instance)
             ->with('config', $this->config)
-            ->with('alias', $this->alias);
+            ->with('alias', $this->key);
     }
 
     // update
@@ -329,13 +320,13 @@ class ReactiveAdminController extends Controller
             }
         }
 
-        return redirect()->to(config('reactiveadmin.uri').'/'.$this->alias);
+        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
     }
 
     public function destroy()
     {
         $instance = $this->model->findOrFail((int)$this->resourceId);
         $instance->delete();
-        return redirect()->to(config('reactiveadmin.uri').'/'.$this->alias);
+        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
     }
 }

@@ -34,19 +34,19 @@ class ReactiveAdminController extends Controller
         $this->perPage = (int)request()->input('perPage', 20);
 
 
-//        $this->filterBy = (array)array_filter(
-//            request()->except(['orderBy', 'perPage', 'page']),
-//            function($val) {
-//                if(is_array($val) && isset($val['starts']) && isset($val['ends']))
-//                {
-//                    return (bool)$val['starts'] && (bool)$val['ends'];
-//                }
-//                else
-//                {
-//                    return (bool)$val;
-//                }
-//            }
-//        );
+        $this->filterBy = (array)array_filter(
+            request()->except(['orderBy', 'perPage', 'page']),
+            function($val) {
+                if(is_array($val) && isset($val['starts']) && isset($val['ends']))
+                {
+                    return (bool)$val['starts'] && (bool)$val['ends'];
+                }
+                else
+                {
+                    return (bool)$val;
+                }
+            }
+        );
 
         // define views
         $this->views['create']  = view()->exists('reactiveadmin::'.$this->key.'.create') ? 'reactiveadmin::'.$this->key.'.create' : 'reactiveadmin::default.create';
@@ -90,9 +90,9 @@ class ReactiveAdminController extends Controller
         return $name;
     }
 
-    protected function applyFilter(&$model)
+    protected function applyFilter($model)
     {
-        foreach ($this->filterParams as $field => $value)
+        foreach ($this->filterBy as $field => $value)
         {
             if(is_array($value))
             {
@@ -140,7 +140,7 @@ class ReactiveAdminController extends Controller
         else
         {
             // apply filter
-//            $model = $this->applyFilter($this->model);
+            $resource->setQuery($this->applyFilter($resource->getQuery()));
 
             return view($this->views['index'])
                 ->with('rows', $resource->getQuery()->paginate($this->perPage))
@@ -151,9 +151,13 @@ class ReactiveAdminController extends Controller
 
     public function create()
     {
-        return view($this->views['create'])
-            ->with('config', $this->config)
-            ->with('alias', $this->key);
+        $resource = ReactiveAdmin::getResource($this->key);
+
+        abort_unless($resource, 404);
+
+        return view()
+            ->first(['reactiveadmin::'.$this->key.'.create', 'reactiveadmin::default.create'])
+            ->with('resource', $resource);
     }
 
     public function store()
@@ -244,17 +248,20 @@ class ReactiveAdminController extends Controller
 
     public function edit()
     {
-        $instance = $this->model->findOrFail((int)$this->resourceId);
-        return view($this->views['edit'])
-            ->with('row', $instance)
-            ->with('config', $this->config)
-            ->with('alias', $this->key);
+        $resource = ReactiveAdmin::getResource($this->key);
+
+        abort_unless($resource, 404);
+
+        return view()
+            ->first(['reactiveadmin::'.$this->key.'.edit', 'reactiveadmin::default.edit'])
+            ->with('row', $resource->getQuery()->findOrFail((int)$this->resourceId))
+            ->with('resource', $resource);
     }
 
     // update
     public function update()
     {
-        $forms = request()->except(['_token', '_method', 'files']);
+        $forms = request()->only(ReactiveAdmin::getKeys());
 
         foreach ($forms as $alias => $form) {
             $config = $this->getModelConfig($alias);
@@ -320,7 +327,8 @@ class ReactiveAdminController extends Controller
             }
         }
 
-        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
+//        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
+        return redirect()->back();
     }
 
     public function destroy()

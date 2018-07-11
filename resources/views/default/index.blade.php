@@ -21,12 +21,8 @@
                 <thead>
                 <tr>
                     <?php $orderBy = request()->input('orderBy', []) ?>
-                    @foreach($resource->getColumnTitles() as $title)
-                        <th>{!! $title !!}</th>
-                        {{--<th>{!! isset($attrs['title']) ? $attrs['title'] : $field !!} @if(isset($attrs['order']) && $attrs['order'])<a--}}
-                                    {{--href="{!! request()->url() !!}?{!! http_build_query(array_merge(["orderBy[$field]"=>$dir], request()->except('orderBy'))) !!}"--}}
-                                    {{--class="fa @if($dir=='asc') fa-chevron-up @else fa-chevron-down @endif @if(isset($orderBy[$field])) text-danger @endif"--}}
-                            {{--></a>@endif</th>--}}
+                    @foreach($resource->getColumns() as $column)
+                        <th>{!! $column->getTitle() !!} {!! $column->getOrderLink() !!}</th>
                     @endforeach
                     <th></th>
                 </tr>
@@ -34,29 +30,17 @@
                 <tbody>
                 @foreach($rows as $one)
                     <tr data-id="{!! $one->id !!}">
-                        @foreach($config['fields'] as $field => $attrs)
-                            @if(isset($attrs['field']))
-                                @if($one && is_a($one->$field, 'Illuminate\Database\Eloquent\Collection'))
-                                    <td>{{ implode(', ', array_fetch($one->$field->toArray(), $attrs['field'])) }}</td>
-                                @else
-                                    <td>{{ $one->$field ? $one->$field->$attrs['field'] : '' }}</td>
-                                @endif
-                            @else
-                                @if(isset($attrs['wrapper']))
-                                    <td>{!! $attrs['wrapper']($one->$field, $one) !!}</td>
-                                @else
-                                    <td>{!! str_limit($one->$field, 80); !!}</td>
-                                @endif
-                            @endif
+                        @foreach($resource->extractColumns($one) as $value)
+                            <td>{!! $value !!}</td>
                         @endforeach
                         <td class="controls d-flex justify-content-end">
                             <div class="btn-group btn-group-sm">
-                                <a href="{!! url(config('reactiveadmin.uri').'/'.$alias.'/'.$one->id.'/edit') !!}"
+                                <a href="{!! $resource->getEditLink($one) !!}"
                                    class="btn btn-warning"
                                    title="{!! trans('reactiveadmin::reactiveadmin.index.edit') !!}">
                                     <span class="fa fa-pencil-alt"></span>
                                 </a>
-                                <a href="#" data-toggle="modal" data-target="#confirmDelete" data-id="{{ $one->id }}" data-action="{!! url(config('reactiveadmin.uri').'/'.$alias.'/'.$one->id.'/destroy') !!}" class="btn btn-danger" data-placement="top" title="{!! trans('reactiveadmin::reactiveadmin.index.delete') !!}">
+                                <a href="#" data-toggle="modal" data-target="#confirmDelete" data-id="{{ $one->id }}" data-action="{!! $resource->getDestroyLink($one) !!}" class="btn btn-danger" data-placement="top" title="{!! trans('reactiveadmin::reactiveadmin.index.delete') !!}">
                                     <span class="fa fa-trash"></span>
                                 </a>
                             </div>
@@ -84,7 +68,7 @@
                     </div>
                     <div class="modal-footer">
                         <form action="" method="post">
-                            {!! csrf_field() !!}
+                            @csrf
                             <input type="hidden" name="_method" value="DELETE">
                             <button type="button" class="btn btn-default" tabindex="0" data-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-danger" tabindex="1">Удалить</button>
@@ -100,11 +84,11 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <form action="" method="post">
-                        {!! csrf_field() !!}
+                        @csrf
                         <input type="hidden" name="_method" value="PUT" class="form-horizontal" role="form" enctype="multipart/form-data">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{!! trans('reactiveadmin.close') !!}</span></button>
-                            <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.edit.title') !!} <q>{!! trans_choice($config['title'], 1) !!}</q></h3>
+                            <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.edit.title') !!} <q>{!! trans_choice($resource->getTitle(), 1) !!}</q></h3>
                         </div>
                         <div class="modal-body">
 
@@ -124,10 +108,10 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
-                        {!! csrf_token() !!}
+                        @csrf
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{!! trans('reactiveadmin.close') !!}</span></button>
-                            <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.create.title') !!} <q>{!! trans_choice($config['title'], 1) !!}</q></h3>
+                            <h3 class="modal-title" id="modalEditLabel">{!! trans('reactiveadmin.create.title') !!} <q>{!! trans_choice($resource->getTitle(), 1) !!}</q></h3>
                         </div>
                         <div class="modal-body">
 

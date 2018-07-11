@@ -1,10 +1,10 @@
-@foreach($config['edit_fields'] as $field => $attrs)
+@foreach($resource->getFields() as $key => $field)
 	@include(
-		'reactiveadmin::partials.fields.'.$attrs['type'],
-		array_merge($attrs, [
-			'name'	=> $alias.'['.$field.']',
-			'value'	=> isset(old($alias)[$field]) ? old($alias)[$field] : '',
-			'label'	=> $attrs['title'],
-		])
+		'reactiveadmin::partials.fields.'.$field->getType(),
+		[
+			'name'	=> $resource->getAlias().'['.$key.']',
+			'value'	=> old($resource->getAlias().'.'.$key) ? old($resource->getAlias().'.'.$key) : '',
+			'label'	=> $field->getTitle(),
+		]
 	)
 @endforeach

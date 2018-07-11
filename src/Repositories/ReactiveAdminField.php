@@ -13,53 +13,89 @@ class ReactiveAdminField
 {
     protected $key;
     protected $title;
-    protected $wrapper;
-    protected $sortable;
-    protected $column;
+    protected $type;
+    protected $formatter_callback;
 
-    public function __construct($key, $title)
+    public function __construct($key, $title, $type)
     {
-        $this->sortable = false;
         $this->key = $key;
         $this->title = $title;
-        $this->column = $this->key;
+        $this->type = $type;
     }
 
-    public function getTitle()
+    /**
+     * @return string
+     */
+    public function getTitle(): string
     {
         return ((bool)$this->title ? $this->title : $this->key);
     }
 
-    public function sortable()
+    /**
+     * @param $title
+     * @return ReactiveAdminField
+     */
+    public function setTitle($title): ReactiveAdminField
     {
-        $this->sortable = true;
+        $this->title = $title;
         return $this;
     }
 
-    public function getOrderLink()
+
+    /**
+     * @return string
+     */
+    public function getType(): string
     {
-        $direction_link = '';
-
-        if((bool)$this->sortable) {
-            $orderBy = request()->input('orderBy', []);
-            $otherParams = request()->except('orderBy');
-            $direction = 'desc';
-            $active = false;
-
-            // is current field active
-            if(isset($orderBy[$this->key])){
-                $active = true;
-                $direction = $orderBy[$this->key]=='desc' ? 'asc' : 'desc';
-            }
-
-            $direction_link = '<a href="'.request()->url().'?'.http_build_query(array_merge(["orderBy[$this->key]"=>$direction], $otherParams)).'" class="fa '.($direction=='asc' ? 'fa-chevron-up' : 'fa-chevron-down').' '.(!$active ?: 'text-danger').'"></a>';
-        }
-
-        return $direction_link;
+        return $this->type;
     }
 
-    public function __toString()
+    /**
+     * @param $type
+     * @return ReactiveAdminField
+     */
+    public function setType($type): ReactiveAdminField
     {
+        $this->type = $type;
+        return $this;
+    }
 
+    /**
+     * @param Closure $fomatter
+     * @return ReactiveAdminField
+     */
+    public function formatter(Closure $fomatter): ReactiveAdminField
+    {
+        $this->formatter_callback = $formatter;
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @param $entity
+     * @return mixed
+     */
+    public function formatterCall($value, $entity)
+    {
+        $formatter = $this->formatter_callback;
+        return is_null($formatter) ? $value : $formatter($value, $entity);
+    }
+
+    /**
+     * @param $method
+     * @param $args
+     * @return $mixed
+     */
+    public function __call($method, $args)
+    {
+        if(starts_with($method, "get")){
+            $property = str_after($method, "get");
+            return $this->{snake_case($property)};
+        } else {
+            $property = $method;
+
+            $this->{snake_case($property)} = $args[0];
+            return $this;
+        }
     }
 }

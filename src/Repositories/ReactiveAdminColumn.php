@@ -13,7 +13,7 @@ class ReactiveAdminColumn
 {
     protected $key;
     protected $title;
-    protected $wrapper;
+    protected $wrapper_callback;
     protected $sortable;
     protected $column;
 
@@ -25,24 +25,36 @@ class ReactiveAdminColumn
         $this->column = $this->key;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
-        return ((bool)$this->title ? $this->title : $this->key);
+        return (string)$this->title;
     }
 
-    public function sortable()
+    public function setTitle($title): ReactiveAdminColumn
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function sortable(): ReactiveAdminColumn
     {
         $this->sortable = true;
         return $this;
     }
 
-    public function wrapper(Closure $wrapper)
+    public function wrapper(Closure $wrapper): ReactiveAdminColumn
     {
-        $this->wrapper = $wrapper;
+        $this->wrapper_callback = $wrapper;
         return $this;
     }
 
-    public function getOrderLink()
+    public function wrapperCall($value, $entity)
+    {
+        $wrapper = $this->wrapper_callback;
+        return is_null($wrapper) ? $value : $wrapper($value, $entity);
+    }
+
+    public function getOrderLink(): string
     {
         $direction_link = '';
 
@@ -64,8 +76,23 @@ class ReactiveAdminColumn
         return $direction_link;
     }
 
-    public function __toString()
+    public function extractColumn($entity)
     {
+        $value = '';
 
+        $relation_field = explode('.', $this->key);
+        if(count($relation_field) > 1) {
+            if(is_a($entity->{$relation_field[1]}, 'Illuminate\Database\Eloquent\Collection')) {
+                $value = implode(', ', array_get($one->{$relation_field[1]}->toArray(), $relation_field[1]));
+            }
+//            elseif(is_subclass_of($entity->{$relation_field[1]}, 'Illuminate\Database\Eloquent\Model')) {     // fuck!
+            else {
+                $value = $entity->{$relation_field[0]} ? $entity->{$relation_field[0]}->{$relation_field[1]} : '';
+            }
+        } else {
+            $value = $entity->{$this->key};
+        }
+
+        return $this->wrapperCall($value, $entity);
     }
 }

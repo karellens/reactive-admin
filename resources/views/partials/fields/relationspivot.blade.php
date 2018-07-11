@@ -1,31 +1,31 @@
 <?php
-list($table, $field) = explode('.', $attrs['field']);
-//list($pivot_table, $pivot_field) = explode('.', $attrs['pivot_field']);
-$values = [];
-if(isset($value))
+$values_dict = [];
+if(isset($value) && $value)
 {
-    foreach ($value->toArray() as $k => $v)
-    {
-        $values[$v['id']] = $v;
+    if(is_array($value)) {
+        $values_dict = $value;
+    } else {
+        $values_dict = $value->getDictionary();
     }
+
 }
 ?>
 <div class="form-group">
-    <label for="{!! $name !!}" class="col-sm-2 control-label">{!! $attrs['title'] !!}</label>
+    <label for="{!! $name !!}" class="col-sm-2 control-label">{!! $label !!}</label>
     <div class="col-sm-10">
         <div class="card">
             <div class="card-body" style="height:25rem;overflow-y:auto;">
-                @foreach(DB::table($table)->pluck($field, 'id') as $key=>$static_value)
+                @foreach($field->getOptions() as $opt_id => $opt_label)
                     <div class="form-group">
-                        <label for="{!! $name !!}[{!! $key !!}]">{{ $static_value }}</label>
+                        <label for="{!! $name !!}[{!! $opt_id !!}]">{{ $opt_label }}</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <input type="checkbox" id="{!! $name !!}[{!! $key !!}]" name="{!! $name !!}[{!! $key !!}][checked]" @if(isset($values[$key])) checked="checked" @endif>
+                                    <input type="checkbox" id="{!! $name !!}[{!! $opt_id !!}]" name="{!! $name !!}[{!! $opt_id !!}][checked]" @if(isset($values_dict[$opt_id])) checked="checked" @endif>
                                 </div>
                             </div>
-                            @foreach($attrs['pivot_fields'] as $pivot_field)
-                                <input type="text" class="form-control" name="{!! $name !!}[{!! $key !!}][{!! $pivot_field !!}]" placeholder="{!! $pivot_field !!}" @if(isset($values[$key])) value="{{ $values[$key]['pivot'][$pivot_field] }}" @else value="" @endif>
+                            @foreach($field->getPivotFields() as $pivot_key => $pivot_label)
+                                <input type="text" class="form-control" name="{!! $name !!}[{!! $opt_id !!}][{!! $pivot_key !!}]" placeholder="{!! $pivot_label !!}" @if(isset($values_dict[$opt_id])) value="{{ $values_dict[$opt_id]['pivot'][$pivot_key] }}" @else value="" @endif>
                             @endforeach
                         </div><!-- /input-group -->
                     </div><!-- /form-group -->

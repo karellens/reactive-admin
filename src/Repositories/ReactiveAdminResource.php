@@ -8,8 +8,8 @@
 
 namespace Karellens\ReactiveAdmin\Repositories;
 
-
 use Karellens\ReactiveAdmin\ReactiveAdminServiceProvider;
+
 
 class ReactiveAdminResource
 {
@@ -26,7 +26,7 @@ class ReactiveAdminResource
 
     protected $stack;
 
-    public function __construct($alias, $title, $description='')
+    public function __construct($alias, $title, $description=null)
     {
         $this->alias = $alias;
         $this->title = $title;
@@ -38,7 +38,7 @@ class ReactiveAdminResource
      */
     public function getAlias(): string
     {
-        return $this->alias;
+        return (string)$this->alias;
     }
 
     /**
@@ -55,7 +55,7 @@ class ReactiveAdminResource
      */
     public function getTitle(): string
     {
-        return $this->title;
+        return (string)$this->title;
     }
 
     /**
@@ -72,13 +72,13 @@ class ReactiveAdminResource
      */
     public function getDescription(): string
     {
-        return $this->class;
+        return (string)$this->description;
     }
 
     /**
      * @param mixed $description
      */
-    public function setDescription($decription): ReactiveAdminResource
+    public function setDescription($description): ReactiveAdminResource
     {
         $this->description = $description;
         return $this;
@@ -89,7 +89,7 @@ class ReactiveAdminResource
      */
     public function getClass(): string
     {
-        return $this->class;
+        return (string)$this->class;
     }
 
     /**
@@ -121,6 +121,27 @@ class ReactiveAdminResource
     /**
      * @return mixed
      */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    /**
+     * @param mixed $filters
+     */
+    public function setFilters($filters): ReactiveAdminResource
+    {
+        $this->filters = $filters;
+        return $this;
+    }
+
+    /**
+     * Columns
+     */
+
+    /**
+     * @return mixed
+     */
     public function getColumns(): array
     {
         return $this->columns;
@@ -134,6 +155,48 @@ class ReactiveAdminResource
         $this->columns = $columns;
         return $this;
     }
+
+    /**
+     * @return ReactiveAdminResource
+     */
+    public function addColumn($alias, $title=null): ReactiveAdminResource
+    {
+        $this->columns[$alias] = new ReactiveAdminColumn($alias, $title);
+        $this->stack[] = $this->columns[$alias];
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getColumn($key): ReactiveAdminColumn
+    {
+        return $this->columns[$key];
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getColumnTitles(): \Generator
+    {
+        foreach ($this->getColumns() as  $column) {
+            yield $column->getTitle();
+        }
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function extractColumns($entity): \Generator
+    {
+        foreach ($this->getColumns() as $key => $column) {
+            yield $column->extractColumn($entity);
+        }
+    }
+
+    /**
+     * Fields
+     */
 
     /**
      * @return mixed
@@ -153,69 +216,74 @@ class ReactiveAdminResource
     }
 
     /**
-     * @return mixed
+     * @param $alias
+     * @param $title
+     * @param $type
+     * @return ReactiveAdminResource
      */
-    public function getFilters(): array
+    public function addField($alias, $title, $type='string'): ReactiveAdminResource
     {
-        return $this->filters;
-    }
-
-    /**
-     * @param mixed $filters
-     */
-    public function setFilters($filters): ReactiveAdminResource
-    {
-        $this->filters = $filters;
-        return $this;
-    }
-
-    public function addColumn($alias, $title=null): ReactiveAdminResource
-    {
-        $this->columns[$alias] = new ReactiveAdminColumn($alias, $title);
-        $this->stack[] = $this->columns[$alias];
-        return $this;
-    }
-
-    public function addField($alias, $title): ReactiveAdminResource
-    {
-        $this->fields[$alias] = new ReactiveAdminField($alias, $title);
+        $this->fields[$alias] = new ReactiveAdminField($alias, $title, $type);
         $this->stack[] = $this->fields[$alias];
         return $this;
     }
 
+    /**
+     * helpful link generators
+     */
+
+    /**
+     * @param $entity
+     * @return string
+     */
     public function getEditLink($entity): string
     {
         return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/edit');
     }
 
+    /**
+     * @param $entity
+     * @return string
+     */
+    public function getUpdateLink($entity): string
+    {
+        return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id);
+    }
+
+    /**
+     * @return string
+     */
     public function getCreateLink(): string
     {
         return url(config('reactiveadmin.uri').'/'.$this->alias.'/create');
     }
 
-    public function getColumnTitles(): \Generator
+    /**
+     * @return string
+     */
+    public function getStoreLink(): string
     {
-        foreach ($this->getColumns() as $column_alias => $column) {
-            yield $column->getTitle();
-        }
+        return url(config('reactiveadmin.uri').'/'.$this->alias);
     }
 
-    public function extractColumns($entities=[])
+    /**
+     * @param $entity
+     * @return string
+     */
+    public function getDestroyLink($entity): string
     {
-        foreach ($this->getColumns() as $column_alias => $column) {
-            # code...
-        }
+        return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/destroy');
     }
 
-    public function extractFields($entity=null)
-    {
-        return null;
-    }
-
+    /**
+     * @param $method
+     * @param $args
+     * @return ReactiveAdminResource
+     */
     public function __call($method, $args): ReactiveAdminResource
     {
         // apply method to last Column or Field retrieved from stack
-        if(count($this->stack) && in_array($method, ['sortable', 'wrapper', 'sizes'])) {
+        if(count($this->stack) && in_array($method, ['sortable', 'wrapper', 'sizes', 'options', 'pivotFields'])) {
             array_values(array_slice($this->stack, -1))[0]->$method(...$args);
         }
         return $this;

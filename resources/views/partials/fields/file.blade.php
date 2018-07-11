@@ -1,5 +1,5 @@
 <div class="form-group">
-    <label for="{!! $name !!}" class="col-sm-2 control-label">{{ $attrs['title'] }}</label>
+    <label for="{!! $name !!}" class="col-sm-2 control-label">{{ $label }}</label>
     <div class="col-sm-10">
         <div class="input-group">
             <div class="input-group-prepend">

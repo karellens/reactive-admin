@@ -1,5 +1,5 @@
 <div class="form-group">
-    <label for="{{ $name }}" class="col-sm-2 control-label">{{ $attrs['title'] }}</label>
+    <label for="{{ $name }}" class="col-sm-2 control-label">{{ $label }}</label>
     <div class="col-sm-10">
 <?php
     list($table, $field) = explode('.', $attrs['field']);
@@ -12,7 +12,7 @@
         $values = is_object($value) ? $value->toArray()['id'] : array($value);
     }
 ?>
-        <select name="{!! $name !!}" id="{!! $name !!}" data-placeholder="{!! $attrs['title'] !!}" class="form-control chosen-select" @if($multiple) multiple="multiple" @endif>
+        <select name="{!! $name !!}" id="{!! $name !!}" data-placeholder="{!! $label !!}" class="form-control chosen-select" @if($multiple) multiple="multiple" @endif>
             @foreach(DB::table($table)->lists($field, 'id') as $key=>$value)
                 <option value="{!! $key !!}" @if(in_array($key, $values)) selected @endif)>{{ $value }}</option>
             @endforeach

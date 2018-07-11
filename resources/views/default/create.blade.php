@@ -3,9 +3,9 @@
 {{-- Content --}}
 @section('content')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1>{!! trans('reactiveadmin::reactiveadmin.create.title') !!} {!! trans_choice($config['title'], 1) !!} @if(isset($config['description']))<small>{!! $config['description'] !!}</small>@endif</h1>
+        <h1>{!! trans('reactiveadmin::reactiveadmin.create.title') !!} {!! trans_choice($resource->getTitle(), 1) !!} {!! str_wrap($resource->getDescription(), ['<small>', '</small>']) !!}</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{!! url(config('reactiveadmin.uri').'/'.$alias.'/create') !!}" class="btn btn-success" data-toggle="modalCreate">
+            <a href="{!! $resource->getCreateLink() !!}" class="btn btn-success" data-toggle="modalCreate">
                 <span class="fa fa-plus-circle"></span> {!! trans('reactiveadmin::reactiveadmin.new') !!}
             </a>
         </div>
@@ -14,7 +14,7 @@
     @include('reactiveadmin::partials.notifications')
 
     <!-- Form panes -->
-    <form action="{!! url(config('reactiveadmin.uri').'/'.$alias) !!}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+    <form action="{!! $resource->getStoreLink() !!}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
         @csrf
         @include('reactiveadmin::partials.create_ajax')
 

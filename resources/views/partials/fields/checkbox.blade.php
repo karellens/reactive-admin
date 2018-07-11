@@ -3,7 +3,7 @@
         <div class="checkbox-inline">
             <input type="hidden" name="{{ $name }}" value="0" >
             <label>
-                <input name="{{ $name }}" type="checkbox" value="1"@if($value) checked="checked"@endif> {{ $attrs['title'] }}
+                <input name="{{ $name }}" type="checkbox" value="1"@if($value) checked="checked"@endif> {{ $label }}
             </label>
         </div>
     </div>

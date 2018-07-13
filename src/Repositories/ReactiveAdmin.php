@@ -31,9 +31,12 @@ class ReactiveAdmin
     /**
      * @return array
      */
-    public function getKeys(): array
+    public function getResourcesLabels(): array
     {
-        return array_keys($this->resources);
+        return array_combine(
+            array_keys($this->resources),
+            array_map(function($r) { return $r->getTitle(); }, $this->resources)
+        );
     }
 
     public function __call($method, $args): ReactiveAdmin

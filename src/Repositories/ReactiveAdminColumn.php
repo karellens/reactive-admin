@@ -36,7 +36,7 @@ class ReactiveAdminColumn
         return $this;
     }
 
-    public function sortable(): ReactiveAdminColumn
+    public function sortable($default='asc'): ReactiveAdminColumn
     {
         $this->sortable = true;
         return $this;

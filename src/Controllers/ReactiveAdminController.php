@@ -261,7 +261,7 @@ class ReactiveAdminController extends Controller
     // update
     public function update()
     {
-        $forms = request()->only(ReactiveAdmin::getKeys());
+        $forms = request()->only(array_keys(ReactiveAdmin::getResourcesLabels()));
 
         foreach ($forms as $alias => $form) {
             $config = $this->getModelConfig($alias);

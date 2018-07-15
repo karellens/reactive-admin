@@ -314,9 +314,9 @@ class ReactiveAdminController extends Controller
 
     public function destroy()
     {
-        $resource = ReactiveAdmin::getResource($alias);
+        $resource = ReactiveAdmin::getResource($this->key);
 
-        $instance = app()->make($resource->getClass())->findOrFail((int)$resourceId);
+        $instance = app()->make($resource->getClass())->findOrFail((int)$this->resourceId);
         $instance->delete();
 
         return redirect()->to($resource->getListLink());

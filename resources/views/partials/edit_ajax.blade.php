@@ -3,7 +3,7 @@
         'reactiveadmin::partials.fields.'.$field->getType(),
         [
             'name'	=> $resource->getAlias().'['.$key.']',
-            'value' => old($resource->getAlias().'.'.$key) ? old($resource->getAlias().'.'.$key) : $field->formatterCall($row->$key, $row),
+            'value' => old($resource->getAlias().'.'.$key, $field->formatterCall($row->$key, $row)),
             'label' => $field->getTitle(),
             'row'   => $row,
         ]

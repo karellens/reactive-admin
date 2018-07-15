@@ -47,23 +47,6 @@ class ReactiveAdminController extends Controller
                 }
             }
         );
-
-        // define views
-        $this->views['create']  = view()->exists('reactiveadmin::'.$this->key.'.create') ? 'reactiveadmin::'.$this->key.'.create' : 'reactiveadmin::default.create';
-        $this->views['edit']    = view()->exists('reactiveadmin::'.$this->key.'.edit') ? 'reactiveadmin::'.$this->key.'.edit' : 'reactiveadmin::default.edit';
-        $this->views['index']   = view()->exists('reactiveadmin::'.$this->key.'.index') ? 'reactiveadmin::'.$this->key.'.index' : 'reactiveadmin::default.index';
-        $this->views['show']    = view()->exists('reactiveadmin::'.$this->key.'.show') ? 'reactiveadmin::'.$this->key.'.show' : 'reactiveadmin::default.show';
-    }
-
-    protected function getFieldType($field_name)
-    {
-        return $this->config['edit_fields'][$field_name]['type'];
-    }
-
-    protected function getModelConfig($alias)
-    {
-        $model_name = ucfirst(str_singular($alias));
-        return require(app_path('RaaConfig/').$model_name.'.php');
     }
 
     protected function storePublicFile(UploadedFile $uploadedFile, $dimensions = [])
@@ -142,7 +125,8 @@ class ReactiveAdminController extends Controller
             // apply filter
             $resource->setQuery($this->applyFilter($resource->getQuery()));
 
-            return view($this->views['index'])
+            return view()
+                ->first(['reactiveadmin::'.$this->key.'.index', 'reactiveadmin::default.index'])
                 ->with('rows', $resource->getQuery()->paginate($this->perPage))
                 ->with('resource', $resource)
                 ->with('key', $this->key);
@@ -163,24 +147,22 @@ class ReactiveAdminController extends Controller
     public function store()
     {
         $models = [];
-        $forms = request()->except(['_token', '_method', 'files']);
+        $forms = request()->only(array_keys(ReactiveAdmin::getResourcesLabels()));
 
         foreach ($forms as $alias => $form) {
-            $config = $this->getModelConfig($alias);
-            $model = $config['model'];
-            $class_name = $config['class_name'];
-            // TODO: filter fields
-            //        $input = request()->only( array_merge(['password_confirmation'], array_keys($this->config['edit_fields'])) );
+            $resource = ReactiveAdmin::getResource($alias);
+
             $input = $form;
 
             $possible_relations = [];
             $own_fields = [];
+
             // filter only direct fields
             foreach ($input as $k => $v)
             {
                 if(is_a($v, 'Illuminate\Http\UploadedFile'))
                 {
-                    $sizes = $this->config['edit_fields'][$k]['sizes'];
+                    $sizes = $resource->getField($k)->getSizes();
                     $own_fields[$k] = $this->storePublicFile($v, $sizes);
                 }
                 elseif (!is_array($v))
@@ -207,6 +189,7 @@ class ReactiveAdminController extends Controller
                 $own_fields['password_confirmation'] = bcrypt($own_fields['password_confirmation']);
             }
 
+            $class_name = $resource->getClass();
             $instance = new $class_name($own_fields);
 
             try {
@@ -215,7 +198,7 @@ class ReactiveAdminController extends Controller
                 return back()->withErrors($e->getMessage())->withInput();
             }
 
-            // one-to-one one-to-many hack
+            // Associate with previous model. one-to-one one-to-many hack
             if(count($models)) {
                 $previous_model = array_values(array_slice($models, -1))[0];
                 $previous_model_name = array_keys(array_slice($models, -1))[0];
@@ -233,14 +216,15 @@ class ReactiveAdminController extends Controller
         }
 
         // redirect back
-        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
+        return redirect()->to($resource->getListLink($this->key));
     }
 
     public function show()
     {
         $instance = $this->model->findOrFail((int)$this->resourceId);
 
-        return view($this->views['show'])
+        return view()
+            ->first(['reactiveadmin::'.$this->key.'.show', 'reactiveadmin::default.show'])
             ->with('row', $instance)
             ->with('config', $this->config)
             ->with('alias', $this->key);
@@ -264,11 +248,8 @@ class ReactiveAdminController extends Controller
         $forms = request()->only(array_keys(ReactiveAdmin::getResourcesLabels()));
 
         foreach ($forms as $alias => $form) {
-            $config = $this->getModelConfig($alias);
-            $model = $config['model'];
-            $class_name = $config['class_name'];
-            // TODO: filter fields
-            //        $input = request()->only( array_merge(['password_confirmation'], array_keys($this->config['edit_fields'])) );
+            $resource = ReactiveAdmin::getResource($alias);
+
             $input = $form;
             $resourceId = $input['id'];
             unset($input['id']);
@@ -281,7 +262,7 @@ class ReactiveAdminController extends Controller
             {
                 if(is_a($v, 'Illuminate\Http\UploadedFile'))
                 {
-                    $sizes = $config['edit_fields'][$k]['sizes'];
+                    $sizes = $resource->getField($k)->getSizes();
                     $own_fields[$k] = $this->storePublicFile($v, $sizes);
                 }
                 elseif (!is_array($v))
@@ -313,7 +294,7 @@ class ReactiveAdminController extends Controller
             }
             //
 
-            $instance = $model->findOrFail((int)$resourceId);
+            $instance = app()->make($resource->getClass())->findOrFail((int)$resourceId);
 
             try {
                 $instance->update($own_fields);
@@ -327,14 +308,17 @@ class ReactiveAdminController extends Controller
             }
         }
 
-//        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
+//        return redirect()->to($resource->getListLink());
         return redirect()->back();
     }
 
     public function destroy()
     {
-        $instance = $this->model->findOrFail((int)$this->resourceId);
+        $resource = ReactiveAdmin::getResource($alias);
+
+        $instance = app()->make($resource->getClass())->findOrFail((int)$resourceId);
         $instance->delete();
-        return redirect()->to(config('reactiveadmin.uri').'/'.$this->key);
+
+        return redirect()->to($resource->getListLink());
     }
 }

@@ -87,9 +87,9 @@ class ReactiveAdminResource
     /**
      * @return mixed
      */
-    public function getClass(): string
+    public function getClass()
     {
-        return (string)$this->class;
+        return $this->class;
     }
 
     /**
@@ -148,7 +148,7 @@ class ReactiveAdminResource
     }
 
     /**
-     * @param mixed $columns
+     * @param ReactiveAdminResource
      */
     public function setColumns($columns): ReactiveAdminResource
     {
@@ -157,22 +157,23 @@ class ReactiveAdminResource
     }
 
     /**
-     * @return ReactiveAdminResource
-     */
-    public function addColumn($alias, $title=null): ReactiveAdminResource
-    {
-        $this->columns[$alias] = new ReactiveAdminColumn($alias, $title);
-        $this->stack[] = $this->columns[$alias];
-        return $this;
-    }
-
-    /**
-     * @return mixed
+     * @return ReactiveAdminColumn
      */
     public function getColumn($key): ReactiveAdminColumn
     {
         return $this->columns[$key];
     }
+
+    /**
+     * @return ReactiveAdminResource
+     */
+    public function addColumn($key, $title=null): ReactiveAdminResource
+    {
+        $this->columns[$key] = new ReactiveAdminColumn($key, $title);
+        $this->stack[] = $this->columns[$key];
+        return $this;
+    }
+
 
     /**
      * @return \Generator
@@ -216,21 +217,37 @@ class ReactiveAdminResource
     }
 
     /**
-     * @param $alias
+     * @return ReactiveAdminColumn
+     */
+    public function getField($key): ReactiveAdminField
+    {
+        return $this->fields[$key];
+    }
+
+    /**
+     * @param $key
      * @param $title
      * @param $type
      * @return ReactiveAdminResource
      */
-    public function addField($alias, $title, $type='string'): ReactiveAdminResource
+    public function addField($key, $title, $type='string'): ReactiveAdminResource
     {
-        $this->fields[$alias] = new ReactiveAdminField($alias, $title, $type);
-        $this->stack[] = $this->fields[$alias];
+        $this->fields[$key] = new ReactiveAdminField($key, $title, $type);
+        $this->stack[] = $this->fields[$key];
         return $this;
     }
 
     /**
      * helpful link generators
      */
+
+    /**
+     * @return string
+     */
+    public function getListLink(): string
+    {
+        return url(config('reactiveadmin.uri').'/'.$this->alias);
+    }
 
     /**
      * @param $entity

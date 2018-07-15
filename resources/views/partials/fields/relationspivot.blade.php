@@ -3,11 +3,18 @@ $values_dict = [];
 if(isset($value) && $value)
 {
     if(is_array($value)) {
-        $values_dict = $value;
+        if(old($resource->getAlias().'.'.$key)) {
+            // filter old
+            $values_dict = array_where($value, function ($value, $key) {
+                return isset($value['checked']);
+            });
+        } else {
+            dump('wtf?');
+            $values_dict = $value;
+        }
     } else {
         $values_dict = $value->getDictionary();
     }
-
 }
 ?>
 <div class="form-group">
@@ -25,7 +32,7 @@ if(isset($value) && $value)
                                 </div>
                             </div>
                             @foreach($field->getPivotFields() as $pivot_key => $pivot_label)
-                                <input type="text" class="form-control" name="{!! $name !!}[{!! $opt_id !!}][{!! $pivot_key !!}]" placeholder="{!! $pivot_label !!}" @if(isset($values_dict[$opt_id])) value="{{ $values_dict[$opt_id]['pivot'][$pivot_key] }}" @else value="" @endif>
+                                <input type="text" class="form-control" name="{!! $name !!}[{!! $opt_id !!}][{!! $pivot_key !!}]" placeholder="{!! $pivot_label !!}" @if(isset($values_dict[$opt_id])) value="{{ $values_dict[$opt_id]['pivot'][$pivot_key] or $values_dict[$opt_id][$pivot_key] }}" @else value="" @endif>
                             @endforeach
                         </div><!-- /input-group -->
                     </div><!-- /form-group -->

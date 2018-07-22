@@ -4,11 +4,13 @@
 @section('content')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1>{!! trans_choice($resource->getTitle(), 2) !!} {!! str_wrap($resource->getDescription(), ['<small>', '</small>']) !!}</h1>
+        @if($resource->can('create'))
         <div class="btn-toolbar mb-2 mb-md-0">
             <a href="{!! $resource->getCreateLink() !!}" class="btn btn-success" data-toggle="modalCreate">
                 <span class="fa fa-plus-circle"></span> {!! trans('reactiveadmin::reactiveadmin.new') !!}
             </a>
         </div>
+        @endif
     </div>
 
     @include('reactiveadmin::partials.notifications')
@@ -35,14 +37,18 @@
                         @endforeach
                         <td class="controls d-flex justify-content-end">
                             <div class="btn-group btn-group-sm">
+                                @if($resource->can('edit'))
                                 <a href="{!! $resource->getEditLink($one) !!}"
                                    class="btn btn-warning"
                                    title="{!! trans('reactiveadmin::reactiveadmin.index.edit') !!}">
                                     <span class="fa fa-pencil-alt"></span>
                                 </a>
+                                @endif
+                                @if($resource->can('destroy'))
                                 <a href="#" data-toggle="modal" data-target="#confirmDelete" data-id="{{ $one->id }}" data-action="{!! $resource->getDestroyLink($one) !!}" class="btn btn-danger" data-placement="top" title="{!! trans('reactiveadmin::reactiveadmin.index.delete') !!}">
                                     <span class="fa fa-trash"></span>
                                 </a>
+                                @endif
                             </div>
                         </td>
                     </tr>

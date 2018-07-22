@@ -16,9 +16,19 @@ class ReactiveAdminResource
     protected $class;
     protected $query;
 
+    protected $permissions = [
+        'create'    => true,
+        'edit'      => true,
+        'destroy'   => true,
+        'trash'     => false,
+    ];
+
     protected $alias;
     protected $title;
     protected $description;
+
+    protected $editLinkParams = [];
+    protected $createLinkParams = [];
 
     protected $columns;
     protected $fields;
@@ -116,6 +126,34 @@ class ReactiveAdminResource
     {
         $this->query = $query;
         return $this;
+    }
+
+    /**
+     * @param array $permissions
+     * @return ReactiveAdminResource
+     */
+    public function setPermissions(array $permissions): ReactiveAdminResource
+    {
+        $this->permissions = array_merge($this->permissions, $permissions);
+        return $this;
+    }
+
+    /**
+     * @param mixed $permissions
+     * @return bool
+     */
+    public function can($permissions): bool
+    {
+        return (bool) !array_diff(
+                (array) $permissions,
+                array_keys($this->permissions)
+            )
+            && (bool) array_product(
+                array_intersect_key(
+                    $this->permissions,
+                    array_fill_keys((array) $permissions, true)
+                )
+            );
     }
 
     /**
@@ -255,7 +293,8 @@ class ReactiveAdminResource
      */
     public function getEditLink($entity): string
     {
-        return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/edit');
+        $query = http_build_query($this->editLinkParams);
+        return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/edit'.($query ? '?'.$query : ''));
     }
 
     /**
@@ -272,7 +311,8 @@ class ReactiveAdminResource
      */
     public function getCreateLink(): string
     {
-        return url(config('reactiveadmin.uri').'/'.$this->alias.'/create');
+        $query = http_build_query($this->createLinkParams);
+        return url(config('reactiveadmin.uri').'/'.$this->alias.'/create').($query ? '?'.$query : '');
     }
 
     /**
@@ -293,6 +333,26 @@ class ReactiveAdminResource
     }
 
     /**
+     * @param array $params
+     * @return ReactiveAdminResource
+     */
+    public function setEditLinkParams(array $params): ReactiveAdminResource
+    {
+        $this->editLinkParams = $params;
+        return $this;
+    }
+
+    /**
+     * @param array $params
+     * @return ReactiveAdminResource
+     */
+    public function setCreateLinkParams(array $params): ReactiveAdminResource
+    {
+        $this->createLinkParams = $params;
+        return $this;
+    }
+
+    /**
      * @param $method
      * @param $args
      * @return ReactiveAdminResource
@@ -300,7 +360,18 @@ class ReactiveAdminResource
     public function __call($method, $args): ReactiveAdminResource
     {
         // apply method to last Column or Field retrieved from stack
-        if(count($this->stack) && in_array($method, ['sortable', 'wrapper', 'sizes', 'options', 'pivotFields'])) {
+        $proxified_methods = [
+            'sortable',
+            'wrapper',
+            'sizes',
+            'options',
+            'title',
+            'type',
+            'help',
+            'value',
+            'pivotFields',
+        ];
+        if(count($this->stack) && in_array($method, $proxified_methods)) {
             array_values(array_slice($this->stack, -1))[0]->$method(...$args);
         }
         return $this;

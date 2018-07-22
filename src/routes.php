@@ -15,7 +15,8 @@ Route::group([
 //        return back();
 //    });
 
-    Route::get('/{alias?}',                 'ReactiveAdminController@index');   //  model ? model : dashboard
+    Route::view('/',                        'reactiveadmin::dashboard');
+    Route::get('/{alias}',                  'ReactiveAdminController@index');   //  model ? model : dashboard
     Route::get('/{alias}/create',           'ReactiveAdminController@create');
     Route::get('/{alias}/{id}',             'ReactiveAdminController@show');
     Route::get('/{alias}/{id}/edit',        'ReactiveAdminController@edit');

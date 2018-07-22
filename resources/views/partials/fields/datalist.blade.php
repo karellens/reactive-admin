@@ -7,5 +7,8 @@
                 <option>{!! $choice !!}</option>
             @endforeach
         </datalist>
+        <small id="{!! $name !!}HelpBlock" class="form-text text-muted">
+            {!! $help !!}
+        </small>
     </div>
 </div>

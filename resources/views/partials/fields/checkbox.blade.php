@@ -6,5 +6,8 @@
                 <input name="{{ $name }}" type="checkbox" value="1"@if($value) checked="checked"@endif> {{ $label }}
             </label>
         </div>
+        <small id="{!! $name !!}HelpBlock" class="form-text text-muted">
+            {!! $help !!}
+        </small>
     </div>
 </div>

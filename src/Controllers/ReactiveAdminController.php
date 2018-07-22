@@ -118,7 +118,7 @@ class ReactiveAdminController extends Controller
         $resource = ReactiveAdmin::getResource($this->key);
         if(!$resource)   // show start page
         {
-            return view('reactiveadmin::dashboard');
+            return redirect(config('reactiveadmin.uri'));
         }
         else
         {
@@ -137,6 +137,7 @@ class ReactiveAdminController extends Controller
     {
         $resource = ReactiveAdmin::getResource($this->key);
 
+        abort_unless($resource->can('create'), 403);
         abort_unless($resource, 404);
 
         return view()
@@ -151,6 +152,9 @@ class ReactiveAdminController extends Controller
 
         foreach ($forms as $alias => $form) {
             $resource = ReactiveAdmin::getResource($alias);
+
+            // WARNING! may cause error or unexpected behavior in case of differrent permissions for individual models
+            abort_unless($resource->can('create'), 403);
 
             $input = $form;
 
@@ -234,6 +238,7 @@ class ReactiveAdminController extends Controller
     {
         $resource = ReactiveAdmin::getResource($this->key);
 
+        abort_unless($resource->can('edit'), 403);
         abort_unless($resource, 404);
 
         return view()
@@ -249,6 +254,9 @@ class ReactiveAdminController extends Controller
 
         foreach ($forms as $alias => $form) {
             $resource = ReactiveAdmin::getResource($alias);
+
+            // WARNING! may cause error or unexpected behavior in case of differrent permissions for individual models
+            abort_unless($resource->can('edit'), 403);
 
             $input = $form;
             $resourceId = $input['id'];

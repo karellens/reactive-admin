@@ -6,5 +6,8 @@
                 <option value="{!! $option_key !!}" @if(isset($value) && $option_key==$value) selected @endif>{!! $option_choice !!}</option>
             @endforeach
         </select>
+        <small id="{!! $name !!}HelpBlock" class="form-text text-muted">
+            {!! $help !!}
+        </small>
     </div>
 </div>

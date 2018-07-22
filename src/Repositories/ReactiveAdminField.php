@@ -14,6 +14,8 @@ class ReactiveAdminField
     protected $key;
     protected $title;
     protected $type;
+    protected $help;
+    protected $default_value;
     protected $formatter_callback;
 
     public function __construct($key, $title, $type)
@@ -35,12 +37,11 @@ class ReactiveAdminField
      * @param $title
      * @return ReactiveAdminField
      */
-    public function setTitle($title): ReactiveAdminField
+    public function title($title): ReactiveAdminField
     {
         $this->title = $title;
         return $this;
     }
-
 
     /**
      * @return string
@@ -54,9 +55,45 @@ class ReactiveAdminField
      * @param $type
      * @return ReactiveAdminField
      */
-    public function setType($type): ReactiveAdminField
+    public function type($type): ReactiveAdminField
     {
         $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHelp()
+    {
+        return $this->help;
+    }
+
+    /**
+     * @param mixed $help
+     * @return ReactiveAdminField
+     */
+    public function help($help): ReactiveAdminField
+    {
+        $this->help = $help;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->default_value;
+    }
+
+    /**
+     * @param mixed $default_value
+     * @return ReactiveAdminField
+     */
+    public function value($default_value): ReactiveAdminField
+    {
+        $this->default_value = $default_value;
         return $this;
     }
 

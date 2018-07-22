@@ -13,10 +13,12 @@ use Closure;
 class ReactiveAdmin
 {
     public $resources;
+    public $deferred_calls;
 
     public function resource($key, $title, Closure $callback)
     {
-        $this->resources[$key] = tap(new ReactiveAdminResource($key, $title), $callback);
+        $this->resources[$key] = new ReactiveAdminResource($key, $title);
+        $this->deferred_calls[$key] = $callback;
         return $this;
     }
 
@@ -25,7 +27,7 @@ class ReactiveAdmin
      */
     public function getResource($key)
     {
-        return isset($this->resources[$key]) ? $this->resources[$key] : null;
+        return isset($this->resources[$key]) ? tap($this->resources[$key], $this->deferred_calls[$key]) : null;
     }
 
     /**

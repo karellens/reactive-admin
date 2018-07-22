@@ -28,7 +28,10 @@ if(isset($value) && $value)
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <input type="checkbox" id="{!! $name !!}[{!! $opt_id !!}]" name="{!! $name !!}[{!! $opt_id !!}][checked]" @if(isset($values_dict[$opt_id])) checked="checked" @endif>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="{!! $name !!}[{!! $opt_id !!}]" name="{!! $name !!}[{!! $opt_id !!}][checked]" @if(isset($values_dict[$opt_id])) checked="checked" @endif>
+                                        <label class="custom-control-label" for="{!! $name !!}[{!! $opt_id !!}]"></label>
+                                    </div>
                                 </div>
                             </div>
                             @foreach($field->getPivotFields() as $pivot_key => $pivot_label)
@@ -39,5 +42,8 @@ if(isset($value) && $value)
                 @endforeach
             </div>
         </div>
+        <small id="{!! $name !!}HelpBlock" class="form-text text-muted">
+            {!! $help !!}
+        </small>
     </div>
 </div>

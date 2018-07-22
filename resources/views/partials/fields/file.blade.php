@@ -10,6 +10,9 @@
                 <label class="custom-file-label" for="{!! $name !!}">Choose file</label>
             </div>
         </div>
+        <small id="{!! $name !!}HelpBlock" class="form-text text-muted">
+            {!! $help !!}
+        </small>
     </div>
     @if(isset($value) && $value && Storage::disk('public')->exists('original/'.$value))
         <div class="col-sm-10">

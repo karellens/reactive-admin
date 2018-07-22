@@ -5,5 +5,8 @@
 			<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
         	<input type="text" name="{{ $name }}" value="{{ $value }}" class="form-control" data-date-format="YYYY-MM-DD HH:mm" id="{{ $name }}" placeholder="{{ $label }}">
 		</div>
+		<small id="{!! $name !!}HelpBlock" class="form-text text-muted">
+			{!! $help !!}
+		</small>
     </div>
 </div>

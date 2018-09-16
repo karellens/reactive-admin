@@ -155,6 +155,7 @@ class ReactiveAdminController extends Controller
 
             // WARNING! may cause error or unexpected behavior in case of differrent permissions for individual models
             abort_unless($resource->can('create'), 403);
+            abort_unless($resource, 404);
 
             $input = $form;
 
@@ -225,19 +226,19 @@ class ReactiveAdminController extends Controller
 
     public function show()
     {
-        $instance = $this->model->findOrFail((int)$this->resourceId);
+        $resource = ReactiveAdmin::getResource($this->key);
+//        abort_unless($resource->can('show'), 403);
+        abort_unless($resource, 404);
 
         return view()
             ->first(['reactiveadmin::'.$this->key.'.show', 'reactiveadmin::default.show'])
-            ->with('row', $instance)
-            ->with('config', $this->config)
-            ->with('alias', $this->key);
+            ->with('row', $resource->getQuery()->findOrFail((int)$this->resourceId))
+            ->with('alias', $resource);
     }
 
     public function edit()
     {
         $resource = ReactiveAdmin::getResource($this->key);
-
         abort_unless($resource->can('edit'), 403);
         abort_unless($resource, 404);
 
@@ -257,6 +258,7 @@ class ReactiveAdminController extends Controller
 
             // WARNING! may cause error or unexpected behavior in case of differrent permissions for individual models
             abort_unless($resource->can('edit'), 403);
+            abort_unless($resource, 404);
 
             $input = $form;
             $resourceId = $input['id'];
@@ -320,12 +322,38 @@ class ReactiveAdminController extends Controller
         return redirect()->back();
     }
 
+    public function trash()
+    {
+        $resource = ReactiveAdmin::getResource($this->key);
+        abort_unless($resource->can('trash'), 403);
+        abort_unless($resource, 404);
+
+        $instance = $resource->getQuery()->findOrFail((int)$this->resourceId);
+        $instance->delete();
+
+        return redirect()->to($resource->getListLink());
+    }
+
+    public function restore()
+    {
+        $resource = ReactiveAdmin::getResource($this->key);
+        abort_unless($resource->can('trash'), 403);
+        abort_unless($resource, 404);
+
+        $instance = $resource->getQuery()->findOrFail((int)$this->resourceId);
+        $instance->restore();
+
+        return redirect()->to($resource->getListLink());
+    }
+
     public function destroy()
     {
         $resource = ReactiveAdmin::getResource($this->key);
+        abort_unless($resource->can('destroy'), 403);
+        abort_unless($resource, 404);
 
-        $instance = app()->make($resource->getClass())->findOrFail((int)$this->resourceId);
-        $instance->delete();
+        $instance = $resource->getQuery()->findOrFail((int)$this->resourceId);
+        $instance->forceDelete();
 
         return redirect()->to($resource->getListLink());
     }

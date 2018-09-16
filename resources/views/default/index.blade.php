@@ -39,10 +39,25 @@
                             <div class="btn-group btn-group-sm">
                                 @if($resource->can('edit'))
                                 <a href="{!! $resource->getEditLink($one) !!}"
-                                   class="btn btn-warning"
+                                   class="btn btn-info"
                                    title="{!! trans('reactiveadmin::reactiveadmin.index.edit') !!}">
                                     <span class="fa fa-pencil-alt"></span>
                                 </a>
+                                @endif
+                                @if($resource->can('trash') && method_exists($one, 'forceDelete'))
+                                    @if($one->trashed())
+                                        <a href="{!! $resource->getRestoreLink($one) !!}"
+                                           class="btn btn-success"
+                                           title="{!! trans('reactiveadmin::reactiveadmin.index.restore') !!}">
+                                            <span class="fa fa-eye"></span>
+                                        </a>
+                                    @else
+                                        <a href="{!! $resource->getTrashLink($one) !!}"
+                                           class="btn btn-warning"
+                                           title="{!! trans('reactiveadmin::reactiveadmin.index.trash') !!}">
+                                            <span class="fa fa-eye-slash"></span>
+                                        </a>
+                                    @endif
                                 @endif
                                 @if($resource->can('destroy'))
                                 <a href="#" data-toggle="modal" data-target="#confirmDelete" data-id="{{ $one->id }}" data-action="{!! $resource->getDestroyLink($one) !!}" class="btn btn-danger" data-placement="top" title="{!! trans('reactiveadmin::reactiveadmin.index.delete') !!}">

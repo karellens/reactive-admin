@@ -15,14 +15,12 @@ class ReactiveAdminColumn
     protected $title;
     protected $wrapper_callback;
     protected $sortable;
-    protected $column;
 
     public function __construct($key, $title)
     {
         $this->sortable = false;
         $this->key = $key;
         $this->title = $title;
-        $this->column = $this->key;
     }
 
     public function getTitle(): string
@@ -78,8 +76,6 @@ class ReactiveAdminColumn
 
     public function extractColumn($entity)
     {
-        $value = '';
-
         $relation_field = explode('.', $this->key);
         if(count($relation_field) > 1) {
             if(is_a($entity->{$relation_field[1]}, 'Illuminate\Database\Eloquent\Collection')) {

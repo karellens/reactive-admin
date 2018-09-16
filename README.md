@@ -26,8 +26,6 @@ php artisan vendor:publish --provider="Karellens\ReactiveAdmin\ReactiveAdminServ
 
 ### Tune-up
 
-Create sidebar menu:
-
 ```bash
 php artisan make:middleware ReactiveAdminMenus
 
@@ -40,6 +38,7 @@ Be sure to also add the middleware to the `app\Http\Kernel.php`
     ];
 ```
 
+Create sidebar menu:
 ```php
     public function handle($request, Closure $next)
     {
@@ -61,80 +60,63 @@ Be sure to also add the middleware to the `app\Http\Kernel.php`
 ```
 
 
-Example of RAAConfig array:
+Example of ReactiveAdminResource config (you can put it in `ReactiveAdminMenus`):
 
 ```php
-<?php
+ReactiveAdmin::resource('pages', 'Page|Pages', function (ReactiveAdminResource $resource)
+    {
+        $resource
+            ->setClass(\App\Page::class)
+            ->setQuery(\App\Page::with(['ancestors', 'blocks']));
 
-/**
- * Page model config
- */
+        $resource
+            ->addColumn('id', '#')->sortable()
+            // concat ancestors like breadcrumbs
+            ->addColumn('ancestors')->wrapper(function ($value) use ($resource) {
+                return '<span style="font-size: 0.7rem;">'.$value->sortBy('_lft')->map(function($v) use ($resource) {
+                        return '<a href="'.$resource->getEditLink($v).'">'.$v->caption.'</a>';
+                    })->implode('>').'</span>';
+            })
+            ->addColumn('caption', 'Caption')->sortable()
+            // concat child Blocks and make it linkable
+            ->addColumn('blocks', 'Blocks')->wrapper(function ($value) {
+                return $value
+                    ->sortBy('pivot.weight')
+                    ->map(function($v){ return '<a href="/admin/blocks/'.$v->id.'/edit">'.$v->title.'</a>'; })
+                    ->implode(', ');
+            })
+            ->addColumn('alias', 'Alias')->sortable()
+            ->addColumn('keywords', 'Meta Keywords')
+            ->addColumn('description', 'Meta Description');
 
-return [
-    'model' => App\Page::with('blocks'),
-    'class_name' => 'App\Page',
-
-    'title' => 'Страницы',
-
-    /**
-     * The display columns
-     */
-    'fields' => [
-        'id'		=> [
-            'title'		=> '#',
-        ],
-        'title' => [
-            'title' => 'Навание',
-        ],
-        'blocks' => [
-            'title'     => 'Блоки',
-            'wrapper'   => function ($value) {
-                return $value->map(function($v){ return '<a href="/admin/blocks/'.$v->id.'/edit">'.$v->title.'</a>'; })->implode(', ');
-            }
-        ],
-        'alias' => [
-            'title' => 'Алиас',
-        ],
-        'keywords' => [
-            'title' => 'Meta keywords',
-        ],
-        'description' => [
-            'title' => 'Meta description',
-        ],
-    ],
-
-    /**
-     * The filter set
-     */
-    'filters' => [
-        'id',
-    ],
-
-    /**
-     * The editable fields
-     */
-    'edit_fields' => [
-        'title' => [
-            'title' => 'Название',
-            'type' => 'string',
-        ],
-        'alias' => [
-            'title' => 'Алиас',
-            'type' => 'string',
-        ],
-        'content' => [
-            'title' => 'Текст',
-            'type' => 'wysiwyg',
-        ],
-        'keywords' => [
-            'title' => 'Meta keywords',
-            'type' => 'string',
-        ],
-        'description' => [
-            'title' => 'Meta description',
-            'type' => 'text',
-        ],
-    ],
-
-];
+        $resource
+            ->addField('parent_id', 'Parent page', 'select')
+                ->options(
+                    ['0' => ''] + DB::table('pages')
+                                    ->get()
+                                    ->pluck('caption', 'id')
+                                    ->toArray()
+                )
+            ->addField('template', 'Template', 'select')
+                ->options([
+                    'default' => 'Standard',
+                    'list' => 'Standard (without right column)',
+                    'full_width' => 'Full width',
+                ])
+            ->addField('title', 'Title')
+            ->addField('caption', 'Caption')
+            ->addField('alias', 'Alias')
+                ->help('Synonym for URL. Example: <strong>`complectation`</strong> for page https://auto.com/pontiac/firebird/<strong>complectation</strong>')
+            ->addField('content', 'Text', 'wysiwyg')
+            ->addField('keywords', 'Meta Keywords')
+                ->help('Keywords for a page separated by commas. Used by search engines.')
+            ->addField('description', 'Meta Description', 'text')
+                ->help('Text description for the page. Used by search engines.')
+            ->addField('blocks', 'Blocks', 'relationspivot')
+                ->formatter(function ($value) {
+                    return $value->title;
+                })
+                ->options(DB::table('blocks')->pluck('title', 'id'))
+                ->pivotFields(['region' => 'Region', 'weight' => 'Order']);
+    });
 ```

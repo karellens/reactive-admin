@@ -8,8 +8,6 @@
 
 namespace Karellens\ReactiveAdmin\Repositories;
 
-use Karellens\ReactiveAdmin\ReactiveAdminServiceProvider;
-
 
 class ReactiveAdminResource
 {
@@ -53,6 +51,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $alias
+     * @return ReactiveAdminResource
      */
     public function setAlias($alias): ReactiveAdminResource
     {
@@ -70,6 +69,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $title
+     * @return ReactiveAdminResource
      */
     public function setTitle($title): ReactiveAdminResource
     {
@@ -87,6 +87,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $description
+     * @return ReactiveAdminResource
      */
     public function setDescription($description): ReactiveAdminResource
     {
@@ -104,6 +105,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $class
+     * @return ReactiveAdminResource
      */
     public function setClass($class): ReactiveAdminResource
     {
@@ -121,6 +123,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $query
+     * @return ReactiveAdminResource
      */
     public function setQuery($query): ReactiveAdminResource
     {
@@ -166,6 +169,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $filters
+     * @return ReactiveAdminResource
      */
     public function setFilters($filters): ReactiveAdminResource
     {
@@ -187,6 +191,7 @@ class ReactiveAdminResource
 
     /**
      * @param ReactiveAdminResource
+     * @return ReactiveAdminResource
      */
     public function setColumns($columns): ReactiveAdminResource
     {
@@ -247,6 +252,7 @@ class ReactiveAdminResource
 
     /**
      * @param mixed $fields
+     * @return ReactiveAdminResource
      */
     public function setFields($fields): ReactiveAdminResource
     {
@@ -330,6 +336,24 @@ class ReactiveAdminResource
     public function getDestroyLink($entity): string
     {
         return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/destroy');
+    }
+
+    /**
+     * @param $entity
+     * @return string
+     */
+    public function getTrashLink($entity): string
+    {
+        return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/trash');
+    }
+
+    /**
+     * @param $entity
+     * @return string
+     */
+    public function getRestoreLink($entity): string
+    {
+        return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/restore');
     }
 
     /**

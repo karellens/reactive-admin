@@ -25,6 +25,7 @@ class ReactiveAdminResource
     protected $title;
     protected $description;
 
+    protected $listLinkParams = [];
     protected $editLinkParams = [];
     protected $createLinkParams = [];
 
@@ -290,7 +291,8 @@ class ReactiveAdminResource
      */
     public function getListLink(): string
     {
-        return url(config('reactiveadmin.uri').'/'.$this->alias);
+        $query = http_build_query($this->listLinkParams);
+        return url(config('reactiveadmin.uri').'/'.$this->alias.($query ? '?'.$query : ''));
     }
 
     /**
@@ -354,6 +356,16 @@ class ReactiveAdminResource
     public function getRestoreLink($entity): string
     {
         return url(config('reactiveadmin.uri').'/'.$this->alias.'/'.$entity->id.'/restore');
+    }
+
+    /**
+     * @param array $params
+     * @return ReactiveAdminResource
+     */
+    public function setListLinkParams(array $params): ReactiveAdminResource
+    {
+        $this->listLinkParams = $params;
+        return $this;
     }
 
     /**

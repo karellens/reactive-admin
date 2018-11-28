@@ -302,9 +302,13 @@ class ReactiveAdminController extends Controller
                 unset($own_fields['password']);
                 unset($own_fields['password_confirmation']);
             }
-            //
 
-            $instance = app()->make($resource->getClass())->findOrFail((int)$resourceId);
+            // is SoftDeletes
+            if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($resource->getClass()))) {
+                $instance = app()->make($resource->getClass())->withTrashed()->findOrFail((int)$resourceId);
+            } else {
+                $instance = app()->make($resource->getClass())->findOrFail((int)$resourceId);
+            }
 
             try {
                 $instance->update($own_fields);

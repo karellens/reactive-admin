@@ -16,7 +16,9 @@
     @include('reactiveadmin::partials.notifications')
 
     @if(isset($rows) && count($rows))
-        {{ method_exists($rows, 'links') ? $rows->links('reactiveadmin::partials.pagination') : '' }}
+        @if(method_exists($rows, 'links'))
+            {!! $rows->appends(request()->input())->links('reactiveadmin::partials.pagination') !!}
+        @endif
 
         <div class="table-responsive">
             <table class="table table-striped table-hover">
@@ -72,7 +74,9 @@
             </table>
         </div>
 
-        {{ method_exists($rows, 'links') ? $rows->links('reactiveadmin::partials.pagination') : '' }}
+        @if(method_exists($rows, 'links'))
+            {!! $rows->appends(request()->input())->links('reactiveadmin::partials.pagination') !!}
+        @endif
 
         <div id="confirmDelete" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm">

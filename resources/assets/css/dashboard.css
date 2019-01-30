@@ -83,6 +83,11 @@ body {
     color: white;
 }
 
+.btn-back {
+    font-size: 1.2rem;
+    padding: .1rem;
+}
+
 /*
  * Navbar
  */

@@ -6,4 +6,4 @@
 1. Localization
 1. Validation
 1. Tests
-1. Redirect to previous page after action
+1. Tree view

@@ -98,10 +98,10 @@ class ReactiveAdminField
     }
 
     /**
-     * @param Closure $fomatter
+     * @param Closure $formatter
      * @return ReactiveAdminField
      */
-    public function formatter(Closure $fomatter): ReactiveAdminField
+    public function formatter(Closure $formatter): ReactiveAdminField
     {
         $this->formatter_callback = $formatter;
         return $this;
